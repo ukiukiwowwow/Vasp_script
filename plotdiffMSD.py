@@ -43,8 +43,8 @@ def newdiff(flag=1):
 			sd.write(str(atoms[i]/(6*time)*10)+" ")
 		sd.write("\n"+"Mean D are "+str(sumDiff/count)+"\n")
 		if(flag==1):
-			temp=temp.reshape(len(temp)/(1+len(atom)),(1+len(atom)))
-			temp2=temp2.reshape(len(temp2)/(1+len(atom)),(1+len(atom)))
+			temp=temp.reshape(int(len(temp)/(1+len(atom))),(1+len(atom)))
+			temp2=temp2.reshape(int(len(temp2)/(1+len(atom))),(1+len(atom)))
 			D=temp.T
 			MSD=temp2.T
 		print(len(D),len(D[0]))
@@ -222,7 +222,7 @@ def eachdiff():
 			if(linecount%5000==0):
 				print(linecount)
 		
-		temp=temp.reshape(len(temp)/(1+len(atom)),(1+len(atom))) #(行,列)
+		temp=temp.reshape(int(len(temp)/(1+len(atom))),(1+len(atom))) #(行,列)
 		MSD=temp.T
 		for i in range(1,len(atoms)+1):
 			plt.plot(MSD[0],MSD[i],label=str(atom[i-1]))
@@ -251,8 +251,7 @@ def eachdiff():
 			plt.clf()
 		
 if __name__=="__main__":
-	#print("Do you want to plot D,type(y)")
-	#if re.compile("y",re.IGNORECASE).match(input().split()[0]) != None:
+	#if re.compile("y",re.IGNORECASE).match(input("If you want to plot graph,strike y ").split()[0]) != None:
 	flag=1
 	#else:
 	#	flag=0

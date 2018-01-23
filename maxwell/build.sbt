@@ -1,3 +1,9 @@
-scalaVersion := "2.12.2"
+name := "maxwellSample"
 
-scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xlint")
+version := "1.0"
+
+scalaVersion := "2.11.8"
+
+libraryDependencies ++= Seq(
+  "com.quantifind" %% "wisp" % "0.0.4"
+)

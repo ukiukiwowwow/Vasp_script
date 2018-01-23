@@ -2,26 +2,33 @@ object maxwll {
    
    def main(args: Array[String]):Unit={
       import math._
+      import java.io.PrintWriter
       import scala.util.Random
+      import com.quantifind.charts.Highcharts._
       println("Hello, world!")
-      val h=1.7*pow(10,-27)
+      val h=1.7*pow(10,-27)*2
+      val Si = 28*pow(10,-27)*2
+      val O = 16 * pow(10,-27)
       def makeMaxwellDistribution(M:Double,T:Int):List[Double]={
 	    val pre=pow( (M/(2*Pi*1.38*pow(10,-23)*T)) , 3/2)
-	    def process(v:Int):List[Double]={
+	    def process(v:Int):Stream[Double]={
+	    	@scala.annotation.tailrec
 	        val ev=exp(- M*pow(v,2)/(2*1.38*pow(10,-23)*T))
-		    if(v==4000){
-			    (4*Pi*pow(v,2)*pre*ev)::Nil
+		    if(v==4001){
+			    //(4*Pi*pow(v,2)*pre*ev)#::Nil
+			    Stream.empty
 		    } else{
-			    (4*Pi*pow(v,2)*pre*ev)::process(v+1)
+			    (4*Pi*pow(v,2)*pre*ev)#::process(v+1)
 		    }
 	    }
-	    process(0)
+	    process(0).toList
     }
-      val l=makeMaxwellDistribution(h,300)
+      val l=makeMaxwellDistribution(Si,300)
+      val c =makeMaxwellDistribution(Si,100)
       val r=new Random()
       def applyMaxwell(list:List[Double]):Int={
           val xmin=0
-          val xmax=4000
+          val xmax=2000
           val ymax=list.max
           val xrand=r.nextDouble()
           val yrand=r.nextDouble()
@@ -82,7 +89,8 @@ object maxwll {
    
    def makeamendlist(vlist:List[List[Double]],X:Double,Y:Double,Z:Double):List[List[Double]]={
        vlist match{
-           case cur::cdr =>  List(cur(0)-X,cur(1)-Y,cur(2)-Z)::makeamendlist(cdr,X,Y,Z)
+           case cur::cdr =>   cur.map(x => (x-X)*pow(10,-2))::makeamendlist(cdr,X,Y,Z)
+           // List(cur(0)-X,cur(1)-Y,cur(2)-Z)
            case _ => Nil
        }
    }
@@ -96,8 +104,19 @@ object maxwll {
        z+=i(2)
    }
    println(x,y,z)
+   val file = new PrintWriter("./test.dat")
+   for(i <- flist){
+       println(i(0)+" "+i(1)+" "+i(2))
+       file.write(i(0)+" "+i(1)+" "+i(2)+"\n")
+       
+   }
+   file.close()
+   spline((0 to 4000).toList,l)
+   legend(List("300"))
    
-   
+   println(l.size,c.size)
+   spline((0 to 4000).toList,c)
+   legend(List("100"))
    
 }
 }

@@ -2,6 +2,94 @@ import copy
 import re
 import numpy as np
 import sys
+def nptMSD(flag=True):
+	with open("XDATCAR","r") as f,open("cmMSD","w") as cM,open("MSD","w") as M,open("r.dat","w") as R:
+		
+		L=np.array([np.zeros(3)]*3)
+		li=8
+		isFirst=True
+		time=0.
+		d=np.zeros(3)
+		cmMSD=np.zeros(3)
+		for index,line in enumerate(f):
+			if(isFirst):
+				if(index==0):
+					continue
+				elif(index==1):
+					mult=float(line)
+					continue
+				elif(index==2):
+					L[0]=list(map(float,line.split()))
+					continue
+				elif(index==3):
+					L[1]=list(map(float,line.split()))
+					continue
+				elif(index==4):
+					L[2]=list(map(float,line.split()))
+					continue
+				elif(index==5):
+					atomname=line.split()
+					continue
+				elif(index==6):
+					atomnum=list(map(int,line.split()))
+					sumatom=sum(atomnum)
+					#isFirst=False
+					cur=np.array([np.zeros(3)]*sumatom)
+					pre=np.array([np.zeros(3)]*sumatom)
+					r=np.array([np.zeros(3)]*sumatom)
+					continue
+				elif(index==7):
+					continue
+				else:
+					cur[index-7]=list(map(float,line.split()))
+					#cur=np.append(cur,list(map(float,line.split())))
+					if(len(pre)==sumatom):
+						isFirst=False
+			else:
+				if(index%(li+sumatom)==0):
+					if(pre.any()==True):
+						
+						for an in range(sumatom):
+							for dim in range(3):
+								d[dim]=cur[an][dim]-pre[an][dim]
+								d[dim]-=round(d[dim])
+								r[an][dim]+=d[dim]
+						cmMSD=np.sum(r,axis=0)/sumatom
+						cM.write(str(time)+" "+str(cmMSD[0])+" "+str(cmMSD[1])+" "+str(cmMSD[2])+"\n")
+						atomr=(r-cmMSD)[:,0].reshape(1,len(r)).T*L[0]+(r-cmMSD)[:,1].reshape(1,len(r)).T*L[1]+(r-cmMSD)[:,2].reshape(1,len(r)).T*L[2]
+						temp=0;M.write(str(time)+" ")
+						for i in range(len(atoms)):
+							Latom=atomr[temp:temp+atomnum[i]]#-1?
+							"""
+							if(i==0):
+								R.write(str(Latom)+"\n")
+							"""
+							msd=(np.linalg.norm(Latom)**2)/atomnum[i]
+							M.write(str(msd)+" ")#exec('cm{}MSD.write(str(time)+" "+str(msd)+"\n")'.format(i))
+							temp=atomnum[i]#-1?
+						M.write("\n")
+					pre=copy.deepcopy(cur)
+					cur=np.array([np.zeros(3)]*sumatom)
+					time+=0.001 # 1fs unfixed
+					continue
+				elif(index%(li+sumatom)==2):
+					k=line.split()
+					L[0]=list(map(float,line.split()))
+					continue
+				elif(index%(li+sumatom)==3):
+					L[1]=list(map(float,line.split()))
+					continue
+				elif(index%(li+sumatom)==4):
+					L[2]=list(map(float,line.split()))
+					continue
+				elif(index%(li+sumatom)==5 or index%(li+sumatom)==6 or index%(li+sumatom)==7 or index%(li+sumatom)==1):
+					print(line)
+					continue
+				else:
+					cur[index%(li+sumatom)-7]=list(map(float,line.split())))
+					continue
+			
+				
 def MSD(flag=True):
 	with open("XDATCAR","r") as f,open("cmMSD","w") as cM,open("MSD","w") as M,open("r.dat","w") as R:
 		
