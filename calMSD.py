@@ -3,6 +3,10 @@ import re
 import numpy as np
 import sys
 def nptMSD(flag=True):
+	"""
+	エラー原因
+	読み込み範囲を間違えているため msdの値が変なことになっているのでは
+	"""
 	with open("XDATCAR","r") as f,open("cmMSD","w") as cM,open("MSD","w") as M,open("r.dat","w") as R:
 		
 		L=np.array([np.zeros(3)]*3)
@@ -48,26 +52,19 @@ def nptMSD(flag=True):
 			else:
 				if(index%(li+sumatom)==0):
 					if(pre.any()==True):
-						
-						for an in range(sumatom):
-							for dim in range(3):
-								d[dim]=cur[an][dim]-pre[an][dim]
-								d[dim]-=round(d[dim])
-								r[an][dim]+=d[dim]
+						r+=cur-pre
 						cmMSD=np.sum(r,axis=0)/sumatom
-						cM.write(str(time)+" "+str(cmMSD[0])+" "+str(cmMSD[1])+" "+str(cmMSD[2])+"\n")
+						cM.write("{0} {1} {2} {3}\n".format(time,cmMSD[0],cmMSD[1],cmMSD[2]))
 						atomr=(r-cmMSD)[:,0].reshape(1,len(r)).T*L[0]+(r-cmMSD)[:,1].reshape(1,len(r)).T*L[1]+(r-cmMSD)[:,2].reshape(1,len(r)).T*L[2]
-						temp=0;M.write(str(time)+" ")
-						for i in range(len(atoms)):
+						M.write("{0} ".format(time))
+						temp=0
+						for i in range(len(atomname)):
 							Latom=atomr[temp:temp+atomnum[i]]#-1?
-							"""
-							if(i==0):
-								R.write(str(Latom)+"\n")
-							"""
 							msd=(np.linalg.norm(Latom)**2)/atomnum[i]
-							M.write(str(msd)+" ")#exec('cm{}MSD.write(str(time)+" "+str(msd)+"\n")'.format(i))
-							temp=atomnum[i]#-1?
+							M.write(str(msd)+" ")
+							temp=atomnum[i]
 						M.write("\n")
+						
 					pre=copy.deepcopy(cur)
 					cur=np.array([np.zeros(3)]*sumatom)
 					time+=0.001 # 1fs unfixed
