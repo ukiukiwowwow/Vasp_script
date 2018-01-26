@@ -6,6 +6,7 @@ def nptMSD(flag=True):
 	"""
 	エラー原因
 	読み込み範囲を間違えているため msdの値が変なことになっているのでは
+	cur[??] ??がおかしいですね
 	"""
 	with open("XDATCAR","r") as f,open("cmMSD","w") as cM,open("MSD","w") as M,open("r.dat","w") as R:
 		
@@ -68,6 +69,7 @@ def nptMSD(flag=True):
 					pre=copy.deepcopy(cur)
 					cur=np.array([np.zeros(3)]*sumatom)
 					time+=0.001 # 1fs unfixed
+					count=0
 					continue
 				elif(index%(li+sumatom)==2):
 					k=line.split()
@@ -83,7 +85,8 @@ def nptMSD(flag=True):
 					print(line)
 					continue
 				else:
-					cur[index%(li+sumatom)-7]=list(map(float,line.split())))
+					cur[count]=list(map(float,line.split())))
+					count+=1
 					continue
 			
 				
