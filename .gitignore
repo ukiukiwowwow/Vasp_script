@@ -218,3 +218,4 @@ pip-log.txt
 /maxwell/*
 !/maxwell/build.sbt
 !/maxwell/maxwell.scala
+/gitautopush*
